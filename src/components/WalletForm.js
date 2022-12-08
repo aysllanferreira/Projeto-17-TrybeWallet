@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { GetCurrencies, saveFullExpense } from '../redux/actions';
+import { GetCurrencies, saveFullExpense, EditExpense } from '../redux/actions';
 
-function WalletForm({ currencies, expenses, dispatch }) {
+function WalletForm({ currencies, expenses, dispatch, isEditing, desc }) {
   const [despesa, setDespesa] = useState({
     id: 0,
     value: '',
@@ -16,6 +16,14 @@ function WalletForm({ currencies, expenses, dispatch }) {
   const handleChange = ({ target }) => {
     const { name, value } = target;
     setDespesa({ ...despesa, [name]: value });
+  };
+
+  const EditExpenses = () => {
+    const newObj = {
+      ...despesa,
+      newDesc: desc,
+    };
+    dispatch(EditExpense(newObj));
   };
 
   const resetState = () => {
@@ -116,14 +124,25 @@ function WalletForm({ currencies, expenses, dispatch }) {
         </select>
       </label>
 
-      <button
-        type="button"
-        data-testid="button-add"
-        onClick={ handleClick }
-      >
-        Adicionar despesa
+      {isEditing ? (
+        <button
+          type="button"
+          data-testid="edit-btn"
+          onClick={ EditExpenses }
 
-      </button>
+        >
+          Editar despesa
+        </button>
+      ) : (
+        <button
+          type="button"
+          data-testid="button-add"
+          onClick={ handleClick }
+        >
+          Adicionar despesa
+
+        </button>
+      )}
     </div>
   );
 }
@@ -145,6 +164,8 @@ WalletForm.propTypes = {
     method: PropTypes.string,
     tag: PropTypes.string,
   })).isRequired,
+  isEditing: PropTypes.bool.isRequired,
+  desc: PropTypes.string.isRequired,
 };
 
 export default connect(mapStateToProps)(WalletForm);
